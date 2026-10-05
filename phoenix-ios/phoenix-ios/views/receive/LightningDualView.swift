@@ -48,7 +48,7 @@ struct LightningDualView: View {
 
 	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
-	@State var nfcEligible: Bool = false
+	@State var nfcSupported: Bool = false
 	@State var nfcActive: Bool = false
 	
 	// For the cicular buttons: [copy, share, edit]
@@ -129,9 +129,11 @@ struct LightningDualView: View {
 		}
 		.task {
 			// Don't show NFC button unless their device is eligible to use it.
+			// Show it if the device supports it, even if not eligible (e.g. region):
+			// tapping it then explains why it can't be used.
 			if #available(iOS 17.4, *) {
-				if await CardSession.isEligible {
-					nfcEligible = true
+				if CardSession.isSupported {
+					nfcSupported = true
 				}
 			}
 		}
@@ -419,10 +421,10 @@ struct LightningDualView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 30) {
 			copyButton()
 			shareButton()
-			editButton()
-			if nfcEligible {
-				nfcButton()
+			if nfcSupported {
+				tapToReceiveButton()
 			}
+			editButton()
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
@@ -520,10 +522,10 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func nfcButton() -> some View {
+	func tapToReceiveButton() -> some View {
 		
 		actionButton(
-			text: String(localized: "nfc", comment: "button label - try to make it short"),
+			text: String(localized: "tap to receive", comment: "button label - try to make it short"),
 			image: Image(systemName: "dot.radiowaves.forward"),
 			width: 21, height: 21,
 			xOffset: 0, yOffset: 0
@@ -1178,8 +1180,8 @@ struct LightningDualView: View {
 		case .hceNotEligible:
 			msg = String(localized:
 				"""
-				Host card emulation not available.
-				Limited to European Economic Area.
+				Tap to receive is not available.
+				Apple doesn't allow it in your region yet.
 				"""
 			)
 			

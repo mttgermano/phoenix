@@ -267,6 +267,10 @@ struct SendView: View {
 				.frame(width: maxButtonWidth)
 				.read(maxButtonWidthReader)
 			Spacer()
+			roundButton_tapToPay()
+				.frame(width: maxButtonWidth)
+				.read(maxButtonWidthReader)
+			Spacer()
 			roundButton_scanQrCode()
 				.frame(width: maxButtonWidth)
 				.read(maxButtonWidthReader)
@@ -285,6 +289,8 @@ struct SendView: View {
 			roundButton_chooseImage()
 			Spacer()
 			roundButton_nfc()
+			Spacer()
+			roundButton_tapToPay()
 			Spacer()
 			roundButton_scanQrCode()
 		}
@@ -319,6 +325,17 @@ struct SendView: View {
 				labelButton_nfc()
 					.frame(width: maxButtonWidth, alignment: .leading)
 					.read(maxButtonWidthReader)
+				Spacer()
+			}
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				labelButton_tapToPay()
+					.frame(width: maxButtonWidth, alignment: .leading)
+					.read(maxButtonWidthReader)
+				Spacer()
+				Spacer()
+				Color.clear
+					.frame(width: maxButtonWidth, height: 1)
 				Spacer()
 			}
 		}
@@ -408,6 +425,19 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
+	func roundButton_tapToPay() -> some View {
+		
+		roundButtonFactory(
+			text: String(localized: "tap to pay", comment: "button label - try to make it short"),
+			image: Image(systemName: "iphone.radiowaves.left.and.right"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: 0
+		) {
+			startTapToPay()
+		}
+	}
+	
+	@ViewBuilder
 	func roundButton_scanQrCode() -> some View {
 		
 		roundButtonFactory(
@@ -469,6 +499,25 @@ struct SendView: View {
 					.foregroundColor(.primaryForeground)
 			} icon: {
 				Image(systemName: "dot.radiowaves.forward")
+					.resizable()
+					.scaledToFit()
+					.frame(width: labelImageSize, height: labelImageSize)
+					.foregroundColor(.appAccent)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func labelButton_tapToPay() -> some View {
+		
+		Button {
+			startTapToPay()
+		} label: {
+			Label {
+				Text("tap to pay", comment: "button label - try to make it short")
+					.foregroundColor(.primaryForeground)
+			} icon: {
+				Image(systemName: "iphone.radiowaves.left.and.right")
 					.resizable()
 					.scaledToFit()
 					.frame(width: labelImageSize, height: labelImageSize)
@@ -1071,8 +1120,18 @@ struct SendView: View {
 	
 	func startNfc() {
 		log.trace("startNfc()")
+		readNfc()
+	}
+	
+	/// Reads the invoice from another phone using "tap to receive" (which emulates an NFC tag).
+	func startTapToPay() {
+		log.trace("startTapToPay()")
+		readNfc(alertMessage: String(localized: "Hold your phone near the other phone."))
+	}
+	
+	func readNfc(alertMessage: String? = nil) {
 		
-		NfcReader.shared.readCard { (result: Result<NFCNDEFMessage, NfcReader.ReadError>) in
+		let callback = { (result: Result<NFCNDEFMessage, NfcReader.ReadError>) in
 			
 			switch result {
 			case .success(let ndefMsg):
@@ -1081,8 +1140,14 @@ struct SendView: View {
 				handleNfcError(error)
 			}
 		}
+
+		if let alertMessage {
+			NfcReader.shared.readCard(alertMessage: alertMessage, callback)
+		} else {
+			NfcReader.shared.readCard(callback)
+		}
 	}
-	
+
 	func scanQrCode() {
 		log.trace("scanQrCode()")
 		activeSheet = .qrCodeScanner

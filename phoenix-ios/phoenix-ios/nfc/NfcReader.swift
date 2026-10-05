@@ -28,7 +28,10 @@ class NfcReader: NSObject, NFCNDEFReaderSessionDelegate {
 		queue = DispatchQueue(label: "NfcReader")
 	}
 	
-	func readCard(_ callback: @escaping (Result<NFCNDEFMessage, ReadError>) -> Void) {
+	func readCard(
+		alertMessage: String = "Hold your card near the device to read it.",
+		_ callback: @escaping (Result<NFCNDEFMessage, ReadError>) -> Void
+	) {
 		log.trace("readCard()")
 		
 		let fail = { (error: ReadError) in
@@ -50,7 +53,7 @@ class NfcReader: NSObject, NFCNDEFReaderSessionDelegate {
 			}
 			
 			session = NFCNDEFReaderSession(delegate: self, queue: queue, invalidateAfterFirstRead: true)
-			session?.alertMessage = "Hold your card near the device to read it."
+			session?.alertMessage = alertMessage
 			
 			self.callback = callback
 			session?.begin()
