@@ -330,6 +330,7 @@ fun CopyShareButtons(
 
             Spacer(modifier = Modifier.width(16.dp))
             BorderButton(
+                text = stringResource(id = R.string.tap_to_receive_button),
                 icon = R.drawable.ic_nfc,
                 onClick = { activity.startHceService(paymentRequest) }
             )

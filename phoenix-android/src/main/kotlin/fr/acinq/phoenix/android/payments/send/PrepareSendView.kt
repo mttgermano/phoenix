@@ -382,6 +382,8 @@ private fun RowScope.SendButtonsRow(
     ReadDataButton(label = stringResource(id = R.string.preparesend_paste_button), icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onSubmit(it) } }, enabled = enabled)
     if (context.findActivitySafe()?.isNfcReaderAvailable() == true) {
         ReadDataButton(label = stringResource(id = R.string.nfc_button), icon = R.drawable.ic_nfc, onClick = { context.findActivitySafe()?.startNfcReader() }, enabled = enabled)
+        // reads the invoice from another phone using "tap to receive" (the phone emulates an NFC tag)
+        ReadDataButton(label = stringResource(id = R.string.tap_to_pay_button), icon = R.drawable.ic_nfc, onClick = { context.findActivitySafe()?.startNfcReader() }, enabled = enabled)
     }
     ReadDataButton(label = stringResource(id = R.string.preparesend_scan_button), icon = R.drawable.ic_scan_qr, onClick = onShowScanner, enabled = enabled)
 }

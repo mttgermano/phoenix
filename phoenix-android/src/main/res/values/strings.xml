@@ -1013,6 +1013,8 @@
     <string name="nfc_err_hce_not_supported">Tag emulation is not supported</string>
 
     <string name="nfc_button">Nfc</string>
+    <string name="tap_to_receive_button">Tap to receive</string>
+    <string name="tap_to_pay_button">Tap to pay</string>
     <string name="nfc_hce_emulation_title">Hold near the NFC reader</string>
     <string name="nfc_reader_title">Ready to scan</string>
     <string name="nfc_reader_desc">Hold near the NFC device to read it</string>

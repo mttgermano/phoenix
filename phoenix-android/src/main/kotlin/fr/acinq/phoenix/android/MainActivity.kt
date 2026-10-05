@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -162,11 +163,21 @@ class MainActivity : AppCompatActivity() {
         stopNfcReader()
     }
 
+    /** True if the device has NFC, even if it's switched off: [startNfcReader] asks the user to turn it on. */
     fun isNfcReaderAvailable() : Boolean {
-        return nfcAdapter?.isEnabled == true
+        return nfcAdapter != null
+    }
+
+    /** Returns true if NFC is on, else opens the system NFC settings. */
+    private fun ensureNfcEnabled(): Boolean {
+        if (nfcAdapter?.isEnabled == true) return true
+        Toast.makeText(this, applicationContext.getString(R.string.nfc_err_disabled), Toast.LENGTH_SHORT).show()
+        startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+        return false
     }
 
     fun startNfcReader() {
+        if (!ensureNfcEnabled()) return
         if (NfcStateRepository.isEmulating()) {
             Toast.makeText(applicationContext, applicationContext.getString(R.string.nfc_err_busy), Toast.LENGTH_SHORT).show()
             return
@@ -193,7 +204,7 @@ class MainActivity : AppCompatActivity() {
 
     fun isHceSupported() : Boolean {
         val adapter = nfcAdapter
-        return adapter != null && adapter.isEnabled && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
+        return adapter != null && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
     }
 
     fun startHceService(paymentRequest: String) {
@@ -202,10 +213,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (nfcAdapter?.isEnabled == false) {
-            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_disabled), Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (!ensureNfcEnabled()) return
 
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
             Toast.makeText(this, applicationContext.getString(R.string.nfc_err_hce_not_supported), Toast.LENGTH_SHORT).show()
