@@ -59,7 +59,7 @@ jobs:
           cp phoenix-ios/phoenix-ios/Phoenix.entitlements app.entitlements
           for key in aps-environment com.apple.developer.icloud-container-identifiers com.apple.developer.icloud-services \
                      com.apple.developer.nfc.hce com.apple.developer.nfc.hce.iso7816.select-identifier-prefixes; do
-            plutil -remove "$key" app.entitlements
+            /usr/libexec/PlistBuddy -c "Delete :$key" app.entitlements
           done
 
           find "$APP" \( -name '*.framework' -o -name '*.dylib' \) -prune -exec codesign -f -s - {} \;
