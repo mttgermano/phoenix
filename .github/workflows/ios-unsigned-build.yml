@@ -67,6 +67,8 @@ jobs:
             codesign -f -s - --entitlements phoenix-ios/phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements "$ext"
           done
           codesign -f -s - --entitlements app.entitlements "$APP"
+          # Sideloader crashes re-signing nested bundles that already have a _CodeSignature folder.
+          rm -rf "$APP"/Frameworks/*/_CodeSignature "$APP"/PlugIns/*/_CodeSignature
 
           zip -qry Phoenix-testnet-unsigned.ipa Payload
 
