@@ -163,7 +163,7 @@ class WalletReset {
 		
 		let fm = FileManager.default
 		guard
-			let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
+			let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppIdentity.appGroup)
 		else {
 			return step4()
 		}

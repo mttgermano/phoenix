@@ -13,9 +13,18 @@ actual fun getApplicationFilesDirectoryPath(ctx: PlatformContext): String =
 actual fun getApplicationCacheDirectoryPath(ctx: PlatformContext): String =
     NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true)[0] as String
 
+/**
+ * "group.co.acinq.phoenix" for official builds. Sideloading tools rename the bundle id and register
+ * "group.<bundleId>" instead. Must match `AppIdentity.appGroup` on the Swift side.
+ */
+private val appGroup: String = run {
+    val id = NSBundle.mainBundle.bundleIdentifier ?: "co.acinq.phoenix"
+    "group." + id.removeSuffix(".phoenix-notifySrvExt")
+}
+
 actual fun getDatabaseFilesDirectoryPath(ctx: PlatformContext): String? {
     return NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(
-        groupIdentifier = "group.co.acinq.phoenix"
+        groupIdentifier = appGroup
     )?.URLByAppendingPathComponent(
         pathComponent = "databases",
         isDirectory = true

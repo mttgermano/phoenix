@@ -13,7 +13,7 @@ fileprivate typealias Key = GroupPrefsKey
 
 extension UserDefaults {
 	static var group: UserDefaults {
-		return UserDefaults(suiteName: "group.co.acinq.phoenix")!
+		return UserDefaults(suiteName: AppIdentity.appGroup)!
 	}
 }
 

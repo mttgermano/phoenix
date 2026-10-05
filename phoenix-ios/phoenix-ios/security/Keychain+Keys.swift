@@ -1,4 +1,46 @@
 import Foundation
+import Security
+
+/// Identifiers derived from how the app was signed, instead of hardcoding ACINQ's.
+/// Official builds get the same values as before ("group.co.acinq.phoenix", "XD77LN4376").
+/// Sideloading tools (e.g. Sideloader) rename the bundle id and register "group.<bundleId>" under their own team.
+enum AppIdentity {
+
+	/// Bundle id of the main app, also when running inside the notification-service-extension.
+	static let mainBundleId: String = {
+		let id = Bundle.main.bundleIdentifier ?? "co.acinq.phoenix"
+		let extSuffix = ".phoenix-notifySrvExt"
+		return id.hasSuffix(extSuffix) ? String(id.dropLast(extSuffix.count)) : id
+	}()
+
+	static let appGroup = "group.\(mainBundleId)"
+
+	/// The signing team id, read from the default keychain access group ("<teamId>.<bundleId>").
+	static let teamId: String = {
+		let official = "XD77LN4376"
+		let query: [String: Any] = [
+			kSecClass as String            : kSecClassGenericPassword,
+			kSecAttrService as String      : "teamIdProbe",
+			kSecAttrAccount as String      : "teamIdProbe",
+			kSecAttrAccessible as String   : kSecAttrAccessibleAfterFirstUnlock,
+			kSecReturnAttributes as String : true
+		]
+		var result: CFTypeRef? = nil
+		var status = SecItemCopyMatching(query as CFDictionary, &result)
+		if status == errSecItemNotFound {
+			status = SecItemAdd(query as CFDictionary, &result)
+		}
+		guard status == errSecSuccess,
+		      let attrs = result as? [String: Any],
+		      let group = attrs[kSecAttrAccessGroup as String] as? String,
+		      let prefix = group.split(separator: ".").first,
+		      prefix != "group"
+		else {
+			return official
+		}
+		return String(prefix)
+	}()
+}
 
 enum AccessGroup {
 	
@@ -11,8 +53,8 @@ enum AccessGroup {
 	case appAndExtensions
 	
 	var value: String { switch self {
-		case .appOnly          : "XD77LN4376.co.acinq.phoenix"
-		case .appAndExtensions : "group.co.acinq.phoenix"
+		case .appOnly          : "\(AppIdentity.teamId).\(AppIdentity.mainBundleId)"
+		case .appAndExtensions : AppIdentity.appGroup
 	}}
 	
 	var debugName: String { switch self {

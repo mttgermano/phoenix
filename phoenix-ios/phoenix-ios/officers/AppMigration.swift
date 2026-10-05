@@ -112,7 +112,7 @@ class AppMigration {
 		
 		guard
 			let appSupportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
-			let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
+			let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppIdentity.appGroup)
 		else {
 			return
 		}

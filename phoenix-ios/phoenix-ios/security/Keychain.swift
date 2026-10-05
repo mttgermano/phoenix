@@ -172,7 +172,7 @@ class Keychain {
 		let fm = FileManager.default
 		
 		if let appSupportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
-		   let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
+		   let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppIdentity.appGroup)
 		{
 			let oldFile = appSupportDir.appendingPathComponent("security.json", isDirectory: false)
 			let newFile = groupDir.appendingPathComponent("security.json", isDirectory: false)

@@ -28,7 +28,7 @@ class SharedSecurity {
 	private lazy var groupDirectoryUrl: URL = {
 		
 		let fm = FileManager.default
-		guard let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix") else {
+		guard let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppIdentity.appGroup) else {
 			fatalError("FileManager returned nil containerUrl !")
 		}
 		

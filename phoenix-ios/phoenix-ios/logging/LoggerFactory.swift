@@ -47,7 +47,7 @@ class LoggerFactory {
 	class func logsDirectory() throws -> URL {
 		
 		let sharedDir = FileManager.default.containerURL(
-			forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix"
+			forSecurityApplicationGroupIdentifier: AppIdentity.appGroup
 		)!
 		
 		let logsDir: URL = sharedDir.appending(path: "logs", directoryHint: .isDirectory)

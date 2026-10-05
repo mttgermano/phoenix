@@ -83,7 +83,7 @@ class XPC {
 	
 	private let queue = DispatchQueue(label: "XPC")
 	private let channelPrefix = "co.acinq.phoenix"
-	private let groupIdentifier = "group.co.acinq.phoenix"
+	private let groupIdentifier = AppIdentity.appGroup
 	
 	private var channel: String? = nil
 	private var notifyToken: Int32 = NOTIFY_TOKEN_INVALID
