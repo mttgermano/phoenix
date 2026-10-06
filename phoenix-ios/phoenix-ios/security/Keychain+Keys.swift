@@ -14,6 +14,9 @@ enum AppIdentity {
 	}()
 
 	static let appGroup = "group.\(mainBundleId)"
+	
+	/// Sideloaded builds (renamed bundle id) have no iCloud entitlement: any CloudKit call would crash.
+	static let hasICloud = mainBundleId == "co.acinq.phoenix"
 
 	/// The signing team id, read from the default keychain access group ("<teamId>.<bundleId>").
 	static let teamId: String = {

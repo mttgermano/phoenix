@@ -109,6 +109,11 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 		Task {
 			log.trace("fetchSeeds(): starting task")
 			
+			guard AppIdentity.hasICloud else {
+				publisher.send(completion: .finished)
+				return
+			}
+			
 			let container = CKContainer.default()
 			let zoneID = CKRecordZone.default().zoneID
 			
@@ -204,7 +209,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 		let chain = self.chain
 		upgradeTask = Task { @MainActor in
 			
-			if prefs.hasUpgradedSeedCloudBackups {
+			if prefs.hasUpgradedSeedCloudBackups || !AppIdentity.hasICloud {
 				return
 			}
 			

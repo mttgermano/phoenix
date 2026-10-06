@@ -105,9 +105,8 @@ class SyncManager {
 	func checkForCloudCredentials() {
 		log.trace("checkForCloudCredentials()")
 
-		// Sideloaded builds (renamed bundle id) have no iCloud entitlement, and CloudKit would crash.
-		// Report "no iCloud account": the sync managers then stay idle.
-		guard AppIdentity.mainBundleId == "co.acinq.phoenix" else {
+		// No iCloud entitlement (sideloaded build): report "no iCloud account", the sync managers then stay idle.
+		guard AppIdentity.hasICloud else {
 			syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: false)
 			syncBackupManager.cloudCredentialsChanged(hasCloudCredentials: false)
 			return
