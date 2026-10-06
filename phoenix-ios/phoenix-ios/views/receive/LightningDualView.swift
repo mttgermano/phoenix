@@ -48,7 +48,6 @@ struct LightningDualView: View {
 
 	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
-	@State var nfcSupported: Bool = false
 	@State var nfcActive: Bool = false
 	
 	// For the cicular buttons: [copy, share, edit]
@@ -126,16 +125,6 @@ struct LightningDualView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
-		}
-		.task {
-			// Don't show NFC button unless their device is eligible to use it.
-			// Show it if the device supports it, even if not eligible (e.g. region):
-			// tapping it then explains why it can't be used.
-			if #available(iOS 17.4, *) {
-				if CardSession.isSupported {
-					nfcSupported = true
-				}
-			}
 		}
 	}
 	
@@ -421,9 +410,8 @@ struct LightningDualView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 30) {
 			copyButton()
 			shareButton()
-			if nfcSupported {
-				tapToReceiveButton()
-			}
+			// Always shown: if the device/region/build can't emulate a card, tapping it explains why.
+			tapToReceiveButton()
 			editButton()
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
@@ -1172,8 +1160,8 @@ struct LightningDualView: View {
 		case .hceNotAvailable:
 			msg = String(localized:
 				"""
-				Host card emulation not available.
-				Requires iOS 17.4 or later.
+				Tap to receive is not available.
+				Requires iOS 17.4+ and an app build with Apple's card emulation permission.
 				"""
 			)
 			
